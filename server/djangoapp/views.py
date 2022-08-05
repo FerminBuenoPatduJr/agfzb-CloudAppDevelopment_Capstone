@@ -183,7 +183,7 @@ def add_review(request, id):
 def get_all_dealerships(request):
     context = {}
     
-    url = "https://c46b6c26.us-south.apigw.appdomain.cloud/api2/getdealerships"
+    url = "https://a4fc7704.us-south.apigw.appdomain.cloud/api/getdealerships"
 
         # Get dealers from the URL
     dealerships = get_dealers_from_cf(url, context)
