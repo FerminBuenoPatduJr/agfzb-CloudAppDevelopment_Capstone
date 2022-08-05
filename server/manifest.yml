@@ -1,11 +1,11 @@
   applications:
   - name: djangoapp
     routes:
-      - route: eroxas.mybluemix.net
+      - route: fpatdu.mybluemix.net
     memory: 128M
     buildpack: python_buildpack
   - name: eroxas-nginx
     routes:
-      - route: eroxas.mybluemix.net/static
+      - route: fpatdu.mybluemix.net/static
     memory: 128M
     buildpack: staticfile_buildpack
