@@ -1,18 +1,125 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Dealership Review</title>
-    {% load static %}
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-</head>
-
+    <head>
+        <meta charset="UTF-8">
+        {% load static %}
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    </head>
     <body>
+        <nav class="navbar navbar-light" style="background-color: #e3f2fd;">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <a class="navbar-brand" href="{% url 'djangoapp:index' %}">Home</a>
+                    <a class="navbar-brand" href="{% url 'djangoapp:dealership' %}">Dealership</a>
+                    <a class="navbar-brand" href="{% url 'djangoapp:review' %}">Review</a>
+                    <a class="navbar-brand" href="{% url 'djangoapp:about' %}" method="get">About</a>
+                    <a class="navbar-brand" href="{% url 'djangoapp:contact' %}" method="get">Contact Us</a>
+                </div>
+                <ul class="nav navbar-nav navbar-right">
+                    {% if user.is_authenticated %}
+                    <li>
+                        <a class="btn btn-link" href="#">{{ user.first_name }}({{ user.username }})</a>
+                        <a class="btn btn-link" href="{% url 'djangoapp:logout' %}">Logout</a>
+                    </li>
+                    {% else %}
+                    <li>
+                        <form class="form-inline" action="{% url 'djangoapp:login' %}" method="post">
+                            {% csrf_token %}
+                            <div class="input-group">
+                                <input type="text" class="form-control" placeholder="Username" name="username" >
+                                <input type="password" class="form-control" placeholder="Password" name="psw" >
+                                <button class="btn btn-primary" type="submit">Login</button>
+                                <a class="btn btn-link" href="{% url 'djangoapp:registration' %}">Sign Up</a>
+                            </div>
+                        </form>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </nav>
 
-    <!--Add a nav bar here -->
+        <!--Add a registration form here -->
+        <div class="container-fluid">
+            <div class="container">
+                <br>
+                <h4>Dealership Details</h4>
+                <hr>
+                <form action="{% url 'djangoapp:get_dealer' %}" method="get">
+                    {% csrf_token %}
+                    <div class="input-group mb-3">
+                        <input type="text" class="form-control" placeholder="Enter ID dealership" aria-label="Enter ID dealership" aria-describedby="basic-addon2" name="id" required>
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-secondary" type="submit">Query</button>
+                        </div>
+                    </div>
+                </form>
+                {% if message %}
+                <div class="alert alert-warning"> <!--Style the message paragraph with .alert and .alert-warning class -->
+                    {{ message }}
+                </div>
+                {% endif %}
 
-    <!-- Add reviews as cards -->
+                {% if dealership %}
 
+                    {% for dealer in dealership %}
+
+                    <label ><b>ID: </b>{{ dealer.id }}</label> <br />
+                    <label><b>Dealership name: </b>{{ dealer.full_name }}</label> <br />
+                    <label><b>Address: </b>{{ dealer.address }}</label> <br />
+                    <label><b>City: </b>{{ dealer.city }} <b>State: </b>{{ dealer.st }} <b>Zip: </b>{{ dealer.zip }}</label>
+
+                    <form action="{% url 'djangoapp:send_review' dealer.id %}" method="get">
+                        <br />
+                        <div class="mb-3">
+                            <button class="btn btn-primary" type="submit">Send your review</button>
+                        </div> 
+                    </form>
+
+                    <br />
+
+                    {% endfor %}
+
+
+                    {% if messagereview %}
+                    <div class="alert alert-warning"> <!--Style the message paragraph with .alert and .alert-warning class -->
+                        {{ messagereview }}
+                    </div>
+                    {% endif %}
+
+                    {% if reviews %}
+                    <hr>
+                    
+                    <div class="card-columns">
+
+
+                        {% for review in reviews %}
+
+                                <div class="card border-info mb-3">
+                                    <div class="card-header">
+                                    {% if review.sentiment == 'positive' %}
+                                        <img class="card-img-left" src="{{MEDIA_URL}}/emoji/positive.png" style="width: 2rem; height: 2rem;">
+                                    {% endif %}
+                                    {% if review.sentiment == 'negative' %}
+                                        <img class="card-img-left" src="{{MEDIA_URL}}/emoji/negative.png" style="width: 2rem; height: 2rem;">
+                                    {% endif %}
+                                    {% if review.sentiment == 'neutral' %}
+                                        <img class="card-img-left" src="{{MEDIA_URL}}/emoji/neutral.png" style="width: 2rem; height: 2rem;">
+                                    {% endif %}
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="card-title"><b>{{ review.car_model }}, {{ review.car_make }}</b> <br />{{ review.car_year }}</div>
+                                        <div class="card-text">{{ review.review }}</div>
+                                    </div>
+                                </div>
+
+                        {% endfor %}
+
+                    </div>
+
+                    {% endif %}
+
+                {% endif %}
+            </div>
+        </div>
     </body>
-
 </html>
