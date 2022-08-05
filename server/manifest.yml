@@ -4,7 +4,7 @@
       - route: fpatdu.mybluemix.net
     memory: 128M
     buildpack: python_buildpack
-  - name: eroxas-nginx
+  - name: fpatdu-nginx
     routes:
       - route: fpatdu.mybluemix.net/static
     memory: 128M
