@@ -10,13 +10,12 @@ from django.utils.timezone import now
 # - Any other fields you would like to include in car make model
 # - __str__ method to print a car make object
 class CarMake(models.Model):
-    name = models.CharField(max_length=50, primary_key=True)
-    desc = models.CharField(max_length=200)
+    name = models.CharField(null=False, max_length=30, default='Car Make - default')
+    description = models.CharField(null=False, max_length=30, default='Description Car Make - default')
 
     def __str__(self):
-        return self.name
-
-
+        return "Name: " + self.name + ", " + \
+               "Description: " + self.description
 
 # <HINT> Create a Car Model model `class CarModel(models.Model):`:
 # - Many-To-One relationship to Car Make model (One Car Make has many Car Models, using ForeignKey field)
@@ -26,24 +25,36 @@ class CarMake(models.Model):
 # - Year (DateField)
 # - Any other fields you would like to include in car model
 # - __str__ method to print a car make object
-
 class CarModel(models.Model):
-    name = models.CharField(max_length=50, primary_key=True)
-    id = models.CharField(max_length=2)
-    type = models.CharField(max_length=10)
+    dealerid = models.IntegerField()
+    name = models.CharField(null=False, max_length=30, default='Car Model - default')
+    SEDAN = 'Sedan'
+    SUV = 'SUV'
+    WAGON = 'Wagon'
+    CAR_TYPE = [
+        (SEDAN, 'Sedan'),
+        (SUV, 'SUV'),
+        (WAGON, 'Wagon'),
+    ]
+    cartype = models.CharField(
+        null=False,
+        max_length=20,
+        choices=CAR_TYPE,
+        default=SEDAN
+    )
     year = models.DateField(null=True)
-    carmakes = models.ManyToManyField(CarMake)
+    carmake = models.ForeignKey(CarMake, null=True, on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.name
-
-
+        return "Dealer ID: " + str(self.dealerid) + ", " + \
+               "Name: " + self.name + ", " + \
+               "Name: " + self.cartype + ", " + \
+               "Year: " + str(self.year)
 
 # <HINT> Create a plain Python class `CarDealer` to hold dealer data
-
 class CarDealer:
 
-    def __init__(self, address, city, full_name, id, lat, long, short_name, st, zip):
+    def __init__(self, address, city, full_name, id, lat, long, short_name, st, zip, state):
         # Dealer address
         self.address = address
         # Dealer city
@@ -62,37 +73,36 @@ class CarDealer:
         self.st = st
         # Dealer zip
         self.zip = zip
+        # Dealer state
+        self.state = state
 
     def __str__(self):
         return "Dealer name: " + self.full_name
-
-
 
 # <HINT> Create a plain Python class `DealerReview` to hold review data
-
 class DealerReview:
-
-    def __init__(self, dealership, name, purchase, review, purchase_date, car_make, car_model, car_year, sentiment, id):
-        # Dealership
-        self.dealership = dealership
-        # Dealer name
-        self.name = name
-        # Dealer purchase
-        self.purchase = purchase
-        # Dealer review
-        self.review = review
-        # purchase_date
-        self.purchase_date = purchase_date
-        # car_make
-        self.car_make = car_make
-        # car_model
-        self.car_model = car_model
-        # car_year
-        self.car_year = car_year
-        # sentiment
-        self.sentiment = sentiment
-        # id
+    def __init__(self, id, dealership, name, purchase, review, purchase_date, car_make, car_model, car_year, sentiment, color):
         self.id = id
-
+        self.dealership = dealership
+        self.name = name
+        self.purchase = purchase
+        self.review = review
+        self.purchase_date = purchase_date
+        self.car_make = car_make
+        self.car_model = car_model
+        self.car_year = car_year
+        self.sentiment = sentiment
+        self.color = color
+    
     def __str__(self):
-        return "Dealer name: " + self.full_name
+        return "ID: " + str(self.id) + ", " + \
+               "Dealership: " + str(self.dealership) + ", " + \
+               "Name: " + self.name + ", " + \
+               "Purchase: " + self.purchase + ", " + \
+               "Review: " + str(self.review) + ", " + \
+               "Purchase Date: " + str(self.purchase_date) + ", " + \
+               "Car Make: " + self.car_make + ", " + \
+               "Car Model: " + self.car_model + ", " + \
+               "Car Year: " + self.car_year  + ", " + \
+               "Sentiment: " + self.sentiment
+  
