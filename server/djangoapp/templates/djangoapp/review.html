@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        {% load static %}
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+        <script type="text/javascript">
+            function viewyear() {
+                let label = document.getElementById("valueCarYear");
+                let year = document.getElementById("caryear").value;
+                label.innerHTML = year
+            }
+
+            viewyear()
+
+            document.addEventListener("change", viewyear);
+
+        </script>        
+    </head>
+    <body>
+        <nav class="navbar navbar-light" style="background-color: #e3f2fd;">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <a class="navbar-brand" href="{% url 'djangoapp:index' %}">Home</a>
+                    <a class="navbar-brand" href="{% url 'djangoapp:dealership' %}">Dealership</a>
+                    <a class="navbar-brand" href="{% url 'djangoapp:review' %}">Review</a>
+                    <a class="navbar-brand" href="{% url 'djangoapp:about' %}" method="get">About</a>
+                    <a class="navbar-brand" href="{% url 'djangoapp:contact' %}" method="get">Contact Us</a>
+                </div>
+                <ul class="nav navbar-nav navbar-right">
+                    {% if user.is_authenticated %}
+                    <li>
+                        <a class="btn btn-link" href="#">{{ user.first_name }}({{ user.username }})</a>
+                        <a class="btn btn-link" href="{% url 'djangoapp:logout' %}">Logout</a>
+                    </li>
+                    {% else %}
+                    <li>
+                        <form class="form-inline" action="{% url 'djangoapp:login' %}" method="post">
+                            {% csrf_token %}
+                            <div class="input-group">
+                                <input type="text" class="form-control" placeholder="Username" name="username" >
+                                <input type="password" class="form-control" placeholder="Password" name="psw" >
+                                <button class="btn btn-primary" type="submit">Login</button>
+                                <a class="btn btn-link" href="{% url 'djangoapp:registration' %}">Sign Up</a>
+                            </div>
+                        </form>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </nav>
+
+        <!--Add a registration form here -->
+        <div class="container-fluid">
+            <div class="container">
+                <br>
+                <h4>Add Your Review</h4>
+                <hr>
+                <form action="{% url 'djangoapp:review' %}" method="post">
+                    {% csrf_token %}
+                    <div class="input-group mb-3">
+                        <input type="text" class="form-control" placeholder="Enter ID dealership" aria-label="Enter ID dealership" aria-describedby="basic-addon2" name="id" required>
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-secondary" type="submit">Query</button>
+                        </div>
+                    </div>
+                </form>
+
+                {% if message %}
+                <div class="alert alert-warning"> <!--Style the message paragraph with .alert and .alert-warning class -->
+                    {{ message }}
+                </div>
+                {% endif %}
+
+
+                {% if id %}
+
+                    {% for dealer in dealership %}
+
+                        <label ><b>ID: </b>{{ dealer.id }}</label> <br />
+                        <label><b>Dealership name: </b>{{ dealer.full_name }}</label> <br />
+
+                    {% endfor %}
+
+                    <hr>
+                    {% if user.is_authenticated %}
+
+                        <form class="row g-3" action="{% url 'djangoapp:add_review' id %}" method="post">
+                            {% csrf_token %}
+                                <div class="col-12">
+                                    <label><b>Enter your review</b></label>
+                                    <textarea type="text" class="form-control" placeholder="Enter your review" name="review" required></textarea>
+                                </div>
+                                <div class="col-12">
+                                <div class="form-check">
+                                        <br>
+                                        {% for dealer in dealership %}
+                                        <input class="form-check-input" type="checkbox" name="purchasecheck" id="purchasecheck">
+                                        <label for="inputCheck" class="form-check-label">Has purchased the car from {{ dealer.full_name }}?</label>
+                                        {% endfor %}
+                                    </div>    
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-select">
+                                        <br>
+                                        <label for="inputCarMake" class="form-select-label">Select you car make</label>
+                                        <select name="carmake" id="carmake" class="form-select" required>
+                                            {% for make in carmake %}
+                                                <option selected value={{make.name}}>{{make.name}}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div> 
+                                <div class="col-md-4">
+                                    <div class="form-select">
+                                        <br>
+                                        <label for="inputPurchaseDate" class="form-select-label">Select you car model</label>
+                                        <select name="carmodel" id="carmodel" class="form-select" required>
+                                            {% for model in carmodel %}
+                                                <option selected value={{model.name}}>{{model.name}}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-range">
+                                        <br>
+                                        <label for="inputCarYear" class="form-range">Select you car year</label>
+                                        <input class="form-range" type="range" name="caryear" id="caryear" min="2019" max="2022" value="2022" onchange="viewyear()" required>
+                                        <label id="valueCarYear" class="form-range">2022</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <br>
+                                    <label for="inputPurchaseDate" class="form-date-label">Pucharse Date</label>
+                                    <input class="date-own form-control" type="date" name="purchasedate" id="purchasedate" required>
+                                </div>
+                                <div class="col-12">
+                                    <button class="btn btn-primary" type="submit">Send review</button>
+                                </div>    
+                        </form>
+
+                    {% else %}
+                        <div class="alert alert-warning"> <!--Style the message paragraph with .alert and .alert-warning class -->
+                            Please login to submit your review.
+                            Or go to <a href="{% url 'djangoapp:registration' %}" class="alert-link">Sign Up</a>
+                        </div>
+                    {% endif %}    
+
+
+                    {% if messagereview %}
+                        <div class="alert alert-warning"> <!--Style the message paragraph with .alert and .alert-warning class -->
+                            {{ messagereview }}
+                        </div>
+                    {% endif %}
+
+                {% endif %}
+
+            </div>
+        </div>
+    </body>
+</html>
